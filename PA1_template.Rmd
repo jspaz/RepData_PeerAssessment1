@@ -7,6 +7,10 @@ output:
 
 
 ## Loading and preprocessing the data
+```{r, echo=TRUE}
+library(knitr)
+x <- read.csv("activity.csv")
+```
 
 
 
