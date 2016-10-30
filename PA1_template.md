@@ -2,7 +2,8 @@
 
 
 ## Loading and preprocessing the data
-```{r chunk1, echo=TRUE}
+
+```r
 library(ggplot2)
 library(knitr)
 data <- read.csv("activity.csv")
@@ -10,16 +11,34 @@ data <- read.csv("activity.csv")
 
 
 ## What is mean total number of steps taken per day?
-```{r chunk2, echo=TRUE}
+
+```r
 total.steps <- tapply(data$steps, data$date, FUN=sum, na.rm=TRUE)
 qplot(total.steps, binwidth=1000, xlab="total steps per day")
+```
+
+![plot of chunk chunk2](figure/chunk2-1.png)
+
+```r
 mean(total.steps, na.rm=TRUE)
+```
+
+```
+## [1] 9354.23
+```
+
+```r
 median(total.steps, na.rm=TRUE)
+```
+
+```
+## [1] 10395
 ```
 
 
 ## What is the average daily activity pattern?
-```{r chunk3, echo=TRUE}
+
+```r
 averages <- aggregate(x=list(steps=data$steps), by=list(interval=data$interval),
                       FUN=mean, na.rm=TRUE)
 ggplot(data=averages, aes(x=interval, y=steps)) +
@@ -28,20 +47,36 @@ ggplot(data=averages, aes(x=interval, y=steps)) +
     ylab("average steps")
 ```
 
-```{r chunk4, echo=TRUE}
+![plot of chunk chunk3](figure/chunk3-1.png)
+
+
+```r
 averages[which.max(averages$steps),]
+```
+
+```
+##     interval    steps
+## 104      835 206.1698
 ```
 
 
 ## Imputing missing values
 
-```{r chunk5, echo=TRUE}
+
+```r
 missing <- is.na(data$steps)
 # How many missing
 table(missing)
 ```
 
-```{r chunk6, echo=TRUE}
+```
+## missing
+## FALSE  TRUE 
+## 15264  2304
+```
+
+
+```r
 # Replace each missing value with the mean value of its 5-minute interval
 fill.value <- function(steps, interval) {
     filled <- NA
@@ -55,17 +90,35 @@ filled.data <- data
 filled.data$steps <- mapply(fill.value, filled.data$steps, filled.data$interval)
 ```
 
-```{r chunk7, echo=TRUE}
+
+```r
 total.steps <- tapply(filled.data$steps, filled.data$date, FUN=sum)
 qplot(total.steps, binwidth=1000, xlab="total number of steps taken each day")
+```
+
+![plot of chunk chunk7](figure/chunk7-1.png)
+
+```r
 mean(total.steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(total.steps)
+```
+
+```
+## [1] 10766.19
 ```
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r chunk8, echo=TRUE}
+
+```r
 weekday.or.weekend <- function(date) {
     day <- weekdays(date)
     if (day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday"))
@@ -80,8 +133,11 @@ filled.data$day <- sapply(filled.data$date, FUN=weekday.or.weekend)
 ```
 
 
-```{r chunk9, echo=TRUE}
+
+```r
 averages <- aggregate(steps ~ interval + day, data=filled.data, mean)
 ggplot(averages, aes(interval, steps)) + geom_line() + facet_grid(day ~ .) +
     xlab("5-minute interval") + ylab("Number of steps")
 ```
+
+![plot of chunk chunk9](figure/chunk9-1.png)
